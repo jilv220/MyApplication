@@ -1,9 +1,11 @@
 package com.example.sky32.myapplication;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Timer;
@@ -51,9 +53,9 @@ public class MainActivity extends Activity
 {
     Button takepic, stop_timer;
     Button choosePic;                  // the button for choosing the pics
+
     ImageView preview;
     SurfaceView vf;
-
     SurfaceHolder shvf;
 
     Camera camera;
@@ -63,6 +65,7 @@ public class MainActivity extends Activity
     ///
     TextView text1, textview, textUri;
 
+    String mCurrentPhotoPath;
     private static final String FORMAT = "%02d:%02d:%02d";
     ///timeset milliseconds
     final int time = 5000;
@@ -106,22 +109,35 @@ public class MainActivity extends Activity
         stop_timer.setOnClickListener(onClickListener_stop);
         choosePic.setOnClickListener(onClickListener_choosePic); // the listener for choosing pic
 
-
         //gal
-
         pictureCallback = new android.hardware.Camera.PictureCallback() {
             @Override
             public void onPictureTaken(byte[] data, android.hardware.Camera camera) {
                 Bitmap b = BitmapFactory.decodeByteArray(data, 0, data.length);
-                Bitmap c = Bitmap.createBitmap(b, 0, 0, b.getWidth(),
-                        b.getHeight(), null, true);
-                String fn = currentDataFormat();
-                storePhotoToStorage(c, fn);
+                if (b!= null) {
+                    File outPut = new File(Environment.getExternalStorageDirectory()+"/MyPhotos/");
+                    if(!outPut.isDirectory()){
+                        outPut.mkdir();
+                    }
+
+                    outPut = new File(outPut,Long.toString(System.currentTimeMillis()) + ".jpg");
+                    try {
+                        FileOutputStream fileOutputStream = new FileOutputStream(outPut);
+                        b.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+                        fileOutputStream.flush();
+                        fileOutputStream.close();
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
                 Toast.makeText(getApplicationContext(), "Saved", Toast.LENGTH_LONG).show();
                 MainActivity.this.camera.startPreview();
             }
         };
     }
+
 
     private String currentDataFormat() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HH_mm_ss");
@@ -282,22 +298,6 @@ public class MainActivity extends Activity
         }
 
     };
-
-    ////////
-    private void storePhotoToStorage(Bitmap c, String fn) {
-        File output = new File(Environment.getExternalStorageDirectory(),
-                "/P/" + "photo" + fn);
-        try {
-            FileOutputStream fileOutputStream = new FileOutputStream(output);
-            c.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
-            fileOutputStream.flush();
-            fileOutputStream.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
     ////
 @Override
 
