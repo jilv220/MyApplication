@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 import android.app.Activity;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 
 import android.graphics.BitmapFactory;
@@ -22,6 +23,7 @@ import android.hardware.Camera;
 
 import android.hardware.Camera.CameraInfo;
 
+import android.net.Uri;
 import android.os.Bundle;
 
 import android.os.CountDownTimer;
@@ -47,7 +49,8 @@ import android.widget.Toast;
 public class MainActivity extends Activity
 
 {
-    Button takepic , stop_timer;
+    Button takepic, stop_timer;
+    Button choosePic;                  // the button for choosing the pics
     ImageView preview;
     SurfaceView vf;
 
@@ -58,7 +61,7 @@ public class MainActivity extends Activity
 
     boolean working = false;
     ///
-    TextView text1, textview;
+    TextView text1, textview, textUri;
 
     private static final String FORMAT = "%02d:%02d:%02d";
     ///timeset milliseconds
@@ -72,6 +75,7 @@ public class MainActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         text1 = (TextView) findViewById(R.id.textView1);
+        textUri = (TextView) findViewById(R.id.URL); // store the photo url
 
         vf = (SurfaceView) findViewById(R.id.camerapreview);
         shvf = vf.getHolder();
@@ -81,24 +85,27 @@ public class MainActivity extends Activity
         shvf.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
         takepic = (Button) findViewById(R.id.takepicture);
+        choosePic = (Button) findViewById(R.id.choosePhoto);
 
         preview = (ImageView) findViewById(R.id.preview);
         stop_timer = (Button) findViewById(R.id.button2);
 
         ///input
-      //  final EditText edittext = (EditText)findViewById(R.id.editText2);
-      //  String a = edittext.getText().toString();
-       // int timeset = Integer.parseInt(a);
-    //    public int setTime(int t) {
-     //       time = t;
-    //}
-       // final int time = timeset;
+        //  final EditText edittext = (EditText)findViewById(R.id.editText2);
+        //  String a = edittext.getText().toString();
+        // int timeset = Integer.parseInt(a);
+        //    public int setTime(int t) {
+        //       time = t;
+        //}
+        // final int time = timeset;
         //int a = Integer.parseInt((TextView)findViewById(R.id.textview).getText());
 
 
         // setListener
         takepic.setOnClickListener(onClickListener_takepic);
         stop_timer.setOnClickListener(onClickListener_stop);
+        choosePic.setOnClickListener(onClickListener_choosePic); // the listener for choosing pic
+
 
         //gal
 
@@ -114,16 +121,15 @@ public class MainActivity extends Activity
                 MainActivity.this.camera.startPreview();
             }
         };
-
     }
-    private String currentDataFormat () {
+
+    private String currentDataFormat() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HH_mm_ss");
         String currentTime = dateFormat.format(new Date());
         return currentTime;
     }
 
-    public SurfaceHolder.Callback surfaceListener = new SurfaceHolder.Callback()
-    {
+    public SurfaceHolder.Callback surfaceListener = new SurfaceHolder.Callback() {
         @Override
 
         public void surfaceChanged(SurfaceHolder holder, int format, int width, int height)
@@ -134,6 +140,7 @@ public class MainActivity extends Activity
             parameters.setPreviewSize(width, height);
             camera.startPreview();
         }
+
         @Override
 
         public void surfaceCreated(SurfaceHolder holder)
@@ -144,40 +151,42 @@ public class MainActivity extends Activity
 
             CameraInfo cameraInfo = new CameraInfo();
 
-            for(int i=0; i < numberOfCameras; i++)
+            for (int i = 0; i < numberOfCameras; i++)
 
             {
                 Camera.getCameraInfo(i, cameraInfo);
 
-                if(cameraInfo.facing == CameraInfo.CAMERA_FACING_BACK)
+                if (cameraInfo.facing == CameraInfo.CAMERA_FACING_BACK)
 
                     int_cameraID = i;
 
             }
+
             camera = Camera.open(int_cameraID);
-            try
-            {
+
+            try {
                 camera.setPreviewDisplay(shvf);
 
-            }
-
-            catch (IOException e)
-            {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
 
         }
+
         @Override
 
         public void surfaceDestroyed(SurfaceHolder holder)
 
-        { camera.stopPreview();;
+        {
+            camera.stopPreview();
+            ;
             camera.release();
 
             camera = null;
         }
 
     };
+
     ///countdown section
     public void cd() {
         if (working) {
@@ -187,7 +196,7 @@ public class MainActivity extends Activity
 
                 public void onTick(long millisUntilFinished) {
 
-                    text1.setText(""+String.format(FORMAT,
+                    text1.setText("" + String.format(FORMAT,
                             TimeUnit.MILLISECONDS.toHours(millisUntilFinished),
                             TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) - TimeUnit.HOURS.toMinutes(
                                     TimeUnit.MILLISECONDS.toHours(millisUntilFinished)),
@@ -196,7 +205,7 @@ public class MainActivity extends Activity
                 }
 
                 public void onFinish() {
-                  //  text1.setText("Saved");
+                    //  text1.setText("Saved");
                     working = true;
                     cd();
                 }
@@ -204,20 +213,19 @@ public class MainActivity extends Activity
 
         }
     }
-    public void start ()
-    {
-       // cd();
+
+    public void start() {
+        // cd();
 
         if (camera != null && !working)
 
-        { Timer timer = new Timer();
+        {
+            Timer timer = new Timer();
 
-            TimerTask t = new TimerTask()
-            {
+            TimerTask t = new TimerTask() {
                 @Override
-                public void run()
-                {
-                    start ();
+                public void run() {
+                    start();
                 }
             };
 
@@ -229,41 +237,59 @@ public class MainActivity extends Activity
 
     }
 
-    View.OnClickListener onClickListener_takepic = new OnClickListener()
-    {
+    View.OnClickListener onClickListener_takepic = new OnClickListener() {
 
         @Override
 
         public void onClick(View v)
 
-        {   working = false;
+        {
+            working = false;
             start();
             cd();
 
         }
 
     };
-    View.OnClickListener onClickListener_stop = new OnClickListener()
-    {
+
+    // the listener for choosing pic
+    View.OnClickListener onClickListener_choosePic = new OnClickListener() {
+
         @Override
 
         public void onClick(View v)
 
-        {   working = true;
+        {
+            Intent intent = new Intent(Intent.ACTION_PICK,
+                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            startActivityForResult(intent, 0);
+        }
 
-         //   start();
-         //   cd();
+    };
+
+
+    View.OnClickListener onClickListener_stop = new OnClickListener() {
+        @Override
+
+        public void onClick(View v)
+
+        {
+            working = true;
+
+            //   start();
+            //   cd();
 
         }
 
     };
+
     ////////
     private void storePhotoToStorage(Bitmap c, String fn) {
         File output = new File(Environment.getExternalStorageDirectory(),
                 "/P/" + "photo" + fn);
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(output);
-            c.compress(Bitmap.CompressFormat.JPEG,100,fileOutputStream);
+            c.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
             fileOutputStream.flush();
             fileOutputStream.close();
         } catch (FileNotFoundException e) {
@@ -273,27 +299,44 @@ public class MainActivity extends Activity
         }
     }
     ////
+@Override
 
-    public Camera.PictureCallback takePicture = new Camera.PictureCallback()
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
-    {
+        if (resultCode == RESULT_OK) {
+            Uri targetUri = data.getData();
+            textUri.setText(targetUri.toString());
+            Bitmap bitmap;
+            try {
+                bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(targetUri));
+                preview.setImageBitmap(bitmap);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
-        @Override
-
-        public void onPictureTaken(byte[] data, Camera camera)
+        public Camera.PictureCallback takePicture = new Camera.PictureCallback()
 
         {
-            if (data != null)
+
+            @Override
+
+            public void onPictureTaken(byte[] data, Camera camera)
+
             {
-                Bitmap bitmap = BitmapFactory.decodeByteArray(data,  0,  data.length);
+                if (data != null) {
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
 
-                preview.setImageBitmap(bitmap);
-                camera.startPreview();
+                    preview.setImageBitmap(bitmap);
+                    camera.startPreview();
 
-                working = false;
+                    working = false;
+
+                }
 
             }
+        };
+    }
 
-        }
-    };
-}

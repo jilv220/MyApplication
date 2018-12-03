@@ -1,49 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linearLayout"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical">
+    android:layout_height="fill_parent">
 
     <SurfaceView
         android:id="@+id/camerapreview"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.91"/>
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/preview"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/preview"
         android:layout_width="311dp"
-        android:layout_height="207dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentBottom="true"
-        android:src="@drawable/ic_launcher" />
+        android:layout_height="0dp"
+        android:src="@drawable/ic_launcher"
+        app:layout_constraintBottom_toTopOf="@+id/takepicture"
+        app:layout_constraintStart_toStartOf="@+id/camerapreview"
+        app:layout_constraintTop_toBottomOf="@+id/camerapreview" />
 
     <Button
         android:id="@+id/takepicture"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="51dp"
-        android:text="@string/Button" />
+        android:text="@string/Button"
+        app:layout_constraintBottom_toTopOf="@+id/choosePhoto"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/preview" />
+
+    <Button
+        android:id="@+id/choosePhoto"
+        android:layout_width="388dp"
+        android:layout_height="50dp"
+        android:text="@string/choose_photo"
+        app:layout_constraintBottom_toTopOf="@+id/button2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/takepicture" />
 
     <Button
         android:id="@+id/button2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:text="@string/stop" />
+        android:layout_marginBottom="60dp"
+        android:text="@string/stop"
+        app:layout_constraintBottom_toTopOf="@+id/textView1"
+        app:layout_constraintStart_toStartOf="@+id/choosePhoto"
+        app:layout_constraintTop_toBottomOf="@+id/choosePhoto" />
 
     <TextView
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
+        android:layout_marginStart="30dp"
         android:layout_marginLeft="30dp"
-        android:layout_marginTop="60dp"
         android:text="Timer"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button2" />
+
+    <TextView
+        android:id="@+id/URL"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:text="@string/URL"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/textView1"
+        app:layout_constraintTop_toBottomOf="@+id/choosePhoto"
+        app:layout_constraintVertical_bias="0.256" />
 
 
-</LinearLayout>
+</android.support.constraint.ConstraintLayout>

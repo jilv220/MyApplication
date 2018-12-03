@@ -2,4 +2,7 @@
     <string name="app_name">My Application</string>
     <string name="Button">Take Photo</string>
     <string name="stop">Stop</string>
+    <string name="choose_photo">choose photo</string>
+    <string name="URI">URI</string>
+    <string name="URL">URL</string>
 </resources>
